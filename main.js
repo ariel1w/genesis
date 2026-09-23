@@ -8,7 +8,7 @@
     const p = el.parentElement;
     const i = groups.get(p) || 0;
     groups.set(p, i + 1);
-    el.style.setProperty('--rd', Math.min(i * 0.12, 0.6) + 's');
+    el.style.setProperty('--rd', Math.min(i * 0.06, 0.18) + 's');
   });
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -129,13 +129,12 @@
       return;
     }
     document.documentElement.style.scrollBehavior = 'auto';
-    const lenis = new Lenis({ lerp: 0.075, wheelMultiplier: 1.05, smoothWheel: true, syncTouch: false, anchors: { duration: 1.3, easing: soft, offset: -nav.offsetHeight }, autoRaf: true });
+    const lenis = new Lenis({ lerp: 0.075, wheelMultiplier: 1.05, smoothWheel: true, syncTouch: false, anchors: { duration: 1.3, easing: soft }, autoRaf: true });
     const sections = [...document.querySelectorAll('body > header, body > section, body > footer')];
     let landing = false, moving = false, guard;
     const settle = () => {
       const y = lenis.scroll, h = innerHeight;
-      const bar = nav.offsetHeight;
-      const boxes = sections.map(s => { const r = s.getBoundingClientRect(), t = r.top + scrollY; return { top: t === 0 ? 0 : t - bar, height: r.height }; });
+      const boxes = sections.map(s => { const r = s.getBoundingClientRect(); return { top: r.top + scrollY, height: r.height }; });
       // inside a tall section, past its entry: read freely until the next one is close
       const reading = boxes.some(b => b.height > h + 2 && y > b.top + h * REACH && y < b.top + b.height - h * REACH);
       if (reading) return;
@@ -161,6 +160,10 @@
   }
   glide();
   media.addEventListener('change', glide);
+
+  // ---- pause decorative motion off screen ----
+  const pauseIO = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('paused', !e.isIntersecting)));
+  document.querySelectorAll('.hero, .divider, .aiteam, .close').forEach(s => pauseIO.observe(s));
 
   // ---- lightbox ----
   const lb = document.querySelector('.lightbox');
