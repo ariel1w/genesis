@@ -89,7 +89,7 @@
         return {
           x: Math.random() * w, y: randomY ? Math.random() * h : h + 10,
           r: Math.random() * 1.8 + 0.4, vy: -(Math.random() * 0.35 + 0.08),
-          vx: (Math.random() - 0.5) * 0.15, a: Math.random() * 0.6 + 0.2,
+          vx: (Math.random() - 0.5) * 0.15, a: Math.random() * 0.35 + 0.12,
           tw: Math.random() * Math.PI * 2, ts: Math.random() * 0.03 + 0.008
         };
       }
@@ -165,13 +165,112 @@
   const pauseIO = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('paused', !e.isIntersecting)));
   document.querySelectorAll('.hero, .divider, .aiteam, .close').forEach(s => pauseIO.observe(s));
 
+  // ---- music (quiet, whole site; same behaviour as The Box's sound) ----
+  // Browsers refuse sound until the visitor clicks or presses a key, so autoplay is tried first,
+  // then the first click/key anywhere starts it. "Sound off" is remembered for the visit.
+  const LEVEL = 0.35, IN = 2500, OUT = 1200, KEY = 'genesis-sound';
+  const btns = [...document.querySelectorAll('.sound')];
+  const music = new Audio('audio/music.m4a?v=1');
+  music.loop = true; music.preload = 'auto'; music.volume = 0;
+  let ramp = 0, wanted = false;
+  const isOff = () => { try { return sessionStorage.getItem(KEY) === 'off'; } catch { return false; } };
+  let playing = false;
+  const show = on => { playing = on; btns.forEach(b => { b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on); b.querySelector('.sound-label').textContent = on ? 'Sound on' : 'Sound off'; }); };
+  function rampTo(target, ms, then) {
+    cancelAnimationFrame(ramp);
+    const from = music.volume, t0 = performance.now();
+    const tick = t => {
+      const k = Math.min(1, (t - t0) / ms);
+      music.volume = Math.min(1, Math.max(0, from + (target - from) * k));
+      if (k < 1) ramp = requestAnimationFrame(tick); else then && then();
+    };
+    ramp = requestAnimationFrame(tick);
+  }
+  async function start() {
+    if (isOff()) return false;
+    wanted = true;
+    try { await music.play(); } catch { return false; }
+    rampTo(LEVEL, IN); show(true); return true;
+  }
+  function fade() { wanted = false; if (!music.paused) rampTo(0, OUT, () => music.pause()); show(false); }
+  const gesture = e => { if (e.target.closest && e.target.closest('.sound')) return; disarm(); start(); };
+  const arm = () => { document.addEventListener('pointerdown', gesture, true); document.addEventListener('keydown', gesture, true); };
+  const disarm = () => { document.removeEventListener('pointerdown', gesture, true); document.removeEventListener('keydown', gesture, true); };
+  btns.forEach(btn => btn.addEventListener('click', () => {
+    if (playing) { fade(); try { sessionStorage.setItem(KEY, 'off'); } catch {} }
+    else { try { sessionStorage.removeItem(KEY); } catch {} disarm(); start(); }
+  }));
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { if (wanted) rampTo(0, 400, () => music.pause()); }
+    else if (wanted) music.play().then(() => rampTo(LEVEL, IN)).catch(() => {});
+  });
+  // ---- password gate: pressing Enter is also the gesture that lets the music start ----
+  const HASH = 'adc44c23914c67a80d9854a9eb2cb2b260817c1e45f0bdb4449c955a9c493c90';
+  const gate = document.querySelector('.gate'), form = gate.querySelector('form'), pw = gate.querySelector('input'), err = gate.querySelector('.gate-error');
+  const gated = () => document.documentElement.classList.contains('gated');
+  async function sha(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  if (gated()) {
+    window.__lenis && window.__lenis.stop();
+    setTimeout(() => pw.focus(), 400);
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (!isOff()) { wanted = true; music.play().catch(() => {}); }   // inside the gesture, silent until the ramp
+      if ((await sha(pw.value.trim())) !== HASH) {
+        music.pause(); wanted = false;
+        err.textContent = 'Incorrect password';
+        form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake');
+        pw.select(); return;
+      }
+      try { sessionStorage.setItem('genesis-in', '1'); } catch {}
+      if (!isOff()) start();
+      gate.classList.add('leaving');
+      hero.classList.add('entering');
+      form.querySelector('button').disabled = true;
+      setTimeout(() => {
+        document.documentElement.classList.remove('gated');
+        window.__lenis && window.__lenis.start();
+        scrollTo(0, 0);
+      }, reduce ? 0 : 250);
+      setTimeout(() => {
+        gate.remove();
+        hero.setAttribute('tabindex', '-1');
+        hero.focus({ preventScroll: true });
+      }, reduce ? 0 : 1600);
+    });
+  } else {
+    gate.remove();
+    start().then(ok => { if (!ok && !isOff()) arm(); });
+  }
+
   // ---- lightbox ----
   const lb = document.querySelector('.lightbox');
   const lbImg = lb.querySelector('img');
+  let lbTrigger, closeTimer;
   document.querySelectorAll('[data-full]').forEach(b => b.addEventListener('click', () => {
-    lbImg.src = b.dataset.full; lbImg.alt = b.querySelector('img').alt; lb.hidden = false; window.__lenis && window.__lenis.stop();
+    clearTimeout(closeTimer);
+    lb.classList.remove('closing');
+    lbTrigger = b;
+    lbImg.src = b.dataset.full; lbImg.alt = b.querySelector('img').alt;
+    lb.showModal();
+    document.documentElement.classList.add('image-open');
+    window.__lenis && window.__lenis.stop();
   }));
-  const closeLb = () => { lb.hidden = true; lbImg.src = ''; window.__lenis && window.__lenis.start(); };
-  lb.addEventListener('click', closeLb);
-  addEventListener('keydown', e => { if (e.key === 'Escape' && !lb.hidden) closeLb(); });
+  const closeLb = () => {
+    if (!lb.open || lb.classList.contains('closing')) return;
+    lb.classList.add('closing');
+    closeTimer = setTimeout(() => lb.close(), reduce ? 0 : 220);
+  };
+  lb.addEventListener('close', () => {
+    lbImg.removeAttribute('src');
+    lb.classList.remove('closing');
+    document.documentElement.classList.remove('image-open');
+    window.__lenis && window.__lenis.start();
+    lbTrigger && lbTrigger.focus({ preventScroll: true });
+  });
+  lb.querySelector('.lb-close').addEventListener('click', closeLb);
+  lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+  lb.addEventListener('cancel', e => { e.preventDefault(); closeLb(); });
 })();

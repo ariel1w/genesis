@@ -14,9 +14,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-<script>document.documentElement.classList.add("js")</script>
+<script>document.documentElement.classList.add("js");try{if(sessionStorage.getItem("genesis-in")!=="1")document.documentElement.classList.add("gated")}catch(e){document.documentElement.classList.add("gated")}</script>
 <link rel="stylesheet" href="lenis.css?v=3">
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 
@@ -36,6 +36,24 @@
   </defs>
 </svg>
 
+<!-- PASSWORD GATE -->
+<div class="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
+  <div class="rays" aria-hidden="true"></div>
+  <canvas class="dust" aria-hidden="true"></canvas>
+  <form class="gate-box" autocomplete="on">
+    <img class="gate-logo" src="assets/ygp-logo-light.png" alt="Yoav Gross Productions">
+    <span class="kicker">A Partnership Proposal</span>
+    <h1 class="wordmark gate-word" id="gate-title"><span class="gold-text shine">GENESIS</span></h1>
+    <svg class="flourish in" aria-hidden="true"><use href="#flourish"/></svg>
+    <label class="gate-label" for="gate-pw">Private presentation. Please enter the password.</label>
+    <div class="gate-row">
+      <input id="gate-pw" name="password" type="password" autocomplete="current-password" required autofocus>
+      <button type="submit">Enter</button>
+    </div>
+    <p class="gate-error" aria-live="polite"></p>
+  </form>
+</div>
+
 <div class="progress" aria-hidden="true"><span></span></div>
 
 <nav class="topnav" aria-label="Sections">
@@ -46,15 +64,17 @@
     <a href="#team">The Team</a>
     <a href="#partnership">Partnership</a>
     <a href="#contact">Contact</a>
+    <button class="sound in-nav" type="button" aria-pressed="false"><span class="sound-dot" aria-hidden="true"></span><span class="sound-label">Sound off</span></button>
   </div>
 </nav>
 
 <!-- 1 · HERO -->
 <header class="hero dark" id="top">
-  <div class="hero-img"><img src="assets/hero-girl.jpg" alt="A young girl gazes into a woven basket"></div>
+  <div class="hero-img"><img src="assets/hero-girl-enhanced.webp" alt="A young girl gazes into a woven basket"></div>
   <div class="rays" aria-hidden="true"></div>
   <canvas class="dust" aria-hidden="true"></canvas>
   <img class="hero-logo" src="assets/ygp-logo-light.png" alt="Yoav Gross Productions">
+  <button class="sound on-hero" type="button" aria-pressed="false"><span class="sound-dot" aria-hidden="true"></span><span class="sound-label">Sound off</span></button>
   <div class="hero-copy">
     <span class="kicker hero-in" style="--d:.3s">A Partnership Proposal</span>
     <h1 class="wordmark" aria-label="GENESIS"><span class="gold-text shine">GENESIS</span></h1>
@@ -364,13 +384,13 @@
       <p class="cap reveal">Selected recent works show a production-minded pipeline across scripted drama, documentary-style reconstruction, sport storytelling, and visual development, each environment carrying a distinct emotional state, color world, and cinematic language.</p>
     </div>
     <div class="mosaic">
-      <figure class="frame m-big reveal-img"><img src="assets/work-01.jpg" alt=""></figure>
-      <figure class="frame reveal-img"><img src="assets/work-02.jpg" alt=""></figure>
-      <figure class="frame reveal-img"><img src="assets/worlds-01.jpg" alt=""></figure>
-      <figure class="frame reveal-img"><img src="assets/work-03.jpg" alt=""></figure>
-      <figure class="frame reveal-img"><img src="assets/work-04.jpg" alt=""></figure>
-      <figure class="frame reveal-img"><img src="assets/worlds-03.jpg" alt=""></figure>
-      <figure class="frame reveal-img"><img src="assets/worlds-05.jpg" alt=""></figure>
+      <button class="frame m-big reveal-img" type="button" data-full="assets/work-01.jpg" aria-label="Enlarge period drama still"><img src="assets/work-01.jpg" alt="A man seated in a period office, with a dog beside him"></button>
+      <button class="frame reveal-img" type="button" data-full="assets/work-02.jpg" aria-label="Enlarge boy portrait"><img src="assets/work-02.jpg" alt="A boy looking into the distance"></button>
+      <button class="frame reveal-img" type="button" data-full="assets/worlds-01.jpg" aria-label="Enlarge street scene"><img src="assets/worlds-01.jpg" alt="A man and a fantastical donkey character on a city street"></button>
+      <button class="frame reveal-img" type="button" data-full="assets/work-03.jpg" aria-label="Enlarge basketball still"><img src="assets/work-03.jpg" alt="Two Milwaukee basketball fans celebrating"></button>
+      <button class="frame reveal-img" type="button" data-full="assets/work-04.jpg" aria-label="Enlarge underwater world"><img src="assets/work-04.jpg" alt="An illustrated van beneath the sea"></button>
+      <button class="frame reveal-img" type="button" data-full="assets/worlds-03.jpg" aria-label="Enlarge desert architecture"><img src="assets/worlds-03.jpg" alt="Modern white architecture overlooking a desert canyon"></button>
+      <button class="frame reveal-img" type="button" data-full="assets/worlds-05.jpg" aria-label="Enlarge sculpture study"><img src="assets/worlds-05.jpg" alt="Red and white winged sculptures in a gallery"></button>
     </div>
   </div>
 </section>
@@ -451,9 +471,9 @@
   <p class="fineprint">© Yoav Gross Productions · GENESIS · A Partnership Proposal</p>
 </footer>
 
-<div class="lightbox" hidden><button class="lb-close" aria-label="Close">×</button><img alt=""></div>
+<dialog class="lightbox" aria-label="Image preview"><button class="lb-close" type="button" aria-label="Close image preview">×</button><img alt=""></dialog>
 
 <script src="lenis.min.js?v=3"></script>
-<script src="main.js?v=3"></script>
+<script src="main.js?v=8"></script>
 </body>
 </html>
