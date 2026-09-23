@@ -208,6 +208,22 @@
   const HASH = 'adc44c23914c67a80d9854a9eb2cb2b260817c1e45f0bdb4449c955a9c493c90';
   const gate = document.querySelector('.gate'), form = gate.querySelector('form'), pw = gate.querySelector('input'), err = gate.querySelector('.gate-error');
   const gated = () => document.documentElement.classList.contains('gated');
+  function cinematicEntrance() {
+    const title = hero.querySelector('.wordmark .gold-text');
+    if (!title.children.length) {
+      const letters = [...title.textContent];
+      title.textContent = '';
+      letters.forEach((letter, i) => {
+        const span = document.createElement('span');
+        span.className = 'intro-letter';
+        span.textContent = letter;
+        span.style.setProperty('--letter-delay', `${.85 + i * .085}s`);
+        span.setAttribute('aria-hidden', 'true');
+        title.append(span);
+      });
+    }
+    hero.classList.add('cinematic');
+  }
   async function sha(text) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
     return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -227,7 +243,7 @@
       try { sessionStorage.setItem('genesis-in', '1'); } catch {}
       if (!isOff()) start();
       gate.classList.add('leaving');
-      hero.classList.add('entering');
+      cinematicEntrance();
       form.querySelector('button').disabled = true;
       setTimeout(() => {
         document.documentElement.classList.remove('gated');
@@ -242,6 +258,7 @@
     });
   } else {
     gate.remove();
+    cinematicEntrance();
     start().then(ok => { if (!ok && !isOff()) arm(); });
   }
 
