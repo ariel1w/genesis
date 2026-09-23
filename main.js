@@ -53,8 +53,9 @@
       for (const img of para) {
         const r = img.parentElement.getBoundingClientRect();
         if (r.bottom < 0 || r.top > vh) continue;
-        const k = (r.top + r.height / 2 - vh / 2) / (vh + r.height);
-        img.style.transform = `translate3d(0, ${(-k * 18).toFixed(2)}%, 0)`;
+        // slow push-in, pinned to the top edge so heads never leave the frame
+        const k = Math.max(-0.5, Math.min(0.5, (r.top + r.height / 2 - vh / 2) / (vh + r.height)));
+        img.style.transform = `scale(${(1 + (k + 0.5) * 0.12).toFixed(4)})`;
       }
     }
     let cur = -1;
@@ -114,13 +115,60 @@
     });
   }
 
+  // ---- smooth glide + soft landing (same feel as The Box) ----
+  const REACH = 0.28, LAND = 0.95;
+  const soft = t => 1 - Math.pow(1 - t, 4);
+  const media = matchMedia('(min-width: 801px) and (prefers-reduced-motion: no-preference)');
+  let stopGlide = () => {};
+  function glide() {
+    stopGlide();
+    if (!media.matches || !window.Lenis) {
+      document.querySelectorAll('a[href^="#"]').forEach(a => a.onclick = null);
+      document.documentElement.style.scrollBehavior = reduce ? 'auto' : 'smooth';
+      stopGlide = () => {};
+      return;
+    }
+    document.documentElement.style.scrollBehavior = 'auto';
+    const lenis = new Lenis({ lerp: 0.075, wheelMultiplier: 1.05, smoothWheel: true, syncTouch: false, anchors: { duration: 1.3, easing: soft, offset: -nav.offsetHeight }, autoRaf: true });
+    const sections = [...document.querySelectorAll('body > header, body > section, body > footer')];
+    let landing = false, moving = false, guard;
+    const settle = () => {
+      const y = lenis.scroll, h = innerHeight;
+      const bar = nav.offsetHeight;
+      const boxes = sections.map(s => { const r = s.getBoundingClientRect(), t = r.top + scrollY; return { top: t === 0 ? 0 : t - bar, height: r.height }; });
+      // inside a tall section, past its entry: read freely until the next one is close
+      const reading = boxes.some(b => b.height > h + 2 && y > b.top + h * REACH && y < b.top + b.height - h * REACH);
+      if (reading) return;
+      let best = null;
+      for (const b of boxes) {
+        const top = Math.min(lenis.limit, Math.max(0, b.top));
+        if (best === null || Math.abs(top - y) < Math.abs(best - y)) best = top;
+      }
+      if (best === null || Math.abs(best - y) < 2 || Math.abs(best - y) > h * REACH) return;
+      landing = true;
+      const release = () => { landing = false; };
+      guard = setTimeout(release, LAND * 1000 + 200);
+      lenis.scrollTo(best, { duration: LAND, easing: soft, onComplete: () => { clearTimeout(guard); release(); } });
+    };
+    const onLenis = ({ velocity }) => {
+      if (landing) return;
+      if (Math.abs(velocity) > 0.05) { moving = true; return; }
+      if (moving) { moving = false; settle(); }
+    };
+    lenis.on('scroll', onLenis);
+    window.__lenis = lenis;
+    stopGlide = () => { clearTimeout(guard); lenis.off('scroll', onLenis); lenis.destroy(); delete window.__lenis; };
+  }
+  glide();
+  media.addEventListener('change', glide);
+
   // ---- lightbox ----
   const lb = document.querySelector('.lightbox');
   const lbImg = lb.querySelector('img');
   document.querySelectorAll('[data-full]').forEach(b => b.addEventListener('click', () => {
-    lbImg.src = b.dataset.full; lbImg.alt = b.querySelector('img').alt; lb.hidden = false;
+    lbImg.src = b.dataset.full; lbImg.alt = b.querySelector('img').alt; lb.hidden = false; window.__lenis && window.__lenis.stop();
   }));
-  const closeLb = () => { lb.hidden = true; lbImg.src = ''; };
+  const closeLb = () => { lb.hidden = true; lbImg.src = ''; window.__lenis && window.__lenis.start(); };
   lb.addEventListener('click', closeLb);
   addEventListener('keydown', e => { if (e.key === 'Escape' && !lb.hidden) closeLb(); });
 })();
