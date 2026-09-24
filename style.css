@@ -408,6 +408,11 @@ html.gated .gate { display: flex; }
 .gate-box { position: relative; z-index: 2; width: min(560px, 100%); display: flex; flex-direction: column; align-items: center; animation: heroIn 1.2s var(--ease) both; }
 .gate-logo { width: min(150px, 30vw); margin-bottom: 4svh; }
 .gate-word { font-size: min(15vw, 17svh); margin: 1.4svh 0 0; animation: none; }
+.gate-creators { margin-top: clamp(16px, 2.5svh, 26px); color: #fbf1da; }
+.gate-created-by { display: block; margin-bottom: 6px; font: 500 12px var(--f-body); letter-spacing: .2em; text-transform: uppercase; color: var(--gold); }
+.gate-creators strong { display: block; font: 500 clamp(25px, 3.4vw, 36px)/1.2 var(--f-head); }
+.gate-creators strong > span { white-space: nowrap; }
+.gate-creators .gate-amp { color: var(--gold-hi); }
 .gate .flourish { margin: 1.6svh auto 3.4svh; }
 .gate-label { font-family: var(--f-head); font-style: italic; font-size: clamp(18px, 2.6svh, 24px); color: #fbf1da; }
 .gate-row { display: flex; gap: 10px; margin-top: 2.6svh; width: 100%; }
