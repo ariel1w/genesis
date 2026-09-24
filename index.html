@@ -16,7 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 <script>document.documentElement.classList.add("js");try{if(sessionStorage.getItem("genesis-in")!=="1")document.documentElement.classList.add("gated")}catch(e){document.documentElement.classList.add("gated")}</script>
 <link rel="stylesheet" href="lenis.css?v=3">
-<link rel="stylesheet" href="style.css?v=21">
+<link rel="stylesheet" href="style.css?v=24">
 </head>
 <body>
 
@@ -65,6 +65,7 @@
     <a href="#team">The Team</a>
     <a href="#partnership">Partnership</a>
     <a href="#contact">Contact</a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="chapters"><span class="menu-lines" aria-hidden="true"><i></i><i></i><i></i></span><span class="menu-label">Menu</span></button>
     <button class="sound in-nav" type="button" aria-pressed="false"><span class="sound-dot" aria-hidden="true"></span><span class="sound-label">Sound off</span></button>
   </div>
 </nav>
@@ -75,6 +76,7 @@
   <div class="rays" aria-hidden="true"></div>
   <canvas class="dust" aria-hidden="true"></canvas>
   <img class="hero-logo" src="assets/ygp-logo-light.png" alt="Yoav Gross Productions">
+  <button class="menu-btn on-hero" type="button" aria-expanded="false" aria-controls="chapters"><span class="menu-lines" aria-hidden="true"><i></i><i></i><i></i></span><span class="menu-label">Menu</span></button>
   <button class="sound on-hero" type="button" aria-pressed="false"><span class="sound-dot" aria-hidden="true"></span><span class="sound-label">Sound off</span></button>
   <div class="hero-copy">
     <span class="kicker hero-in" style="--d:.3s">A Partnership Proposal</span>
@@ -294,7 +296,7 @@
 </section>
 
 <!-- 6 · SELECTED HITS -->
-<section class="hits parchment deep">
+<section class="hits parchment deep" id="hits">
   <div class="wrap">
     <span class="kicker reveal">Shalom &amp; Daniel Assayag</span>
     <h2 class="title reveal">Selected Hits</h2>
@@ -320,7 +322,7 @@
 </section>
 
 <!-- 7 · AI PRODUCTION TEAM -->
-<section class="aiteam dark">
+<section class="aiteam dark" id="ai-team">
   <div class="rays faint" aria-hidden="true"></div>
   <div class="wrap">
     <span class="kicker reveal">Producer + AI Filmmakers · iAI Studio</span>
@@ -356,7 +358,7 @@
 </section>
 
 <!-- 8 · AI TRACK RECORD -->
-<section class="track parchment">
+<section class="track parchment" id="track-record">
   <div class="wrap">
     <span class="kicker reveal">More than half a decade of collaboration in AI</span>
     <h2 class="title reveal">AI Track Record</h2>
@@ -375,7 +377,7 @@
 </section>
 
 <!-- 9 · iAI STUDIO WORK -->
-<section class="work dark">
+<section class="work dark" id="studio-work">
   <div class="wrap">
     <div class="head-row">
       <div>
@@ -408,7 +410,7 @@
 </section>
 
 <!-- 10 · PROOF OF CONCEPT -->
-<section class="poc parchment">
+<section class="poc parchment" id="proof">
   <div class="wrap poc-grid">
     <div>
       <span class="kicker reveal">Emotion · Family · Continuity</span>
@@ -427,7 +429,7 @@
 </section>
 
 <!-- 11 · WHY PARTNER -->
-<section class="why dark">
+<section class="why dark" id="why-partner">
   <figure class="why-img"><img class="parallax" src="assets/why-partner-girl.jpg" alt="" style="object-position:17% center"></figure>
   <div class="why-copy">
     <span class="kicker reveal">A flagship long-form AI production</span>
@@ -472,9 +474,35 @@
   <p class="fineprint">© Yoav Gross Productions · GENESIS · A Partnership Proposal</p>
 </footer>
 
+<!-- CHAPTERS MENU (phones and tablets) -->
+<div class="chapters" id="chapters" role="dialog" aria-modal="true" aria-label="Chapters" hidden>
+  <div class="chapters-inner">
+    <div class="chapters-head"><span class="chapters-mark gold-text">GENESIS</span><button class="chapters-close" type="button" aria-label="Close menu">×</button></div>
+    <nav class="chapters-list" aria-label="Chapters">
+      <a class="ch-top" href="#series">The Series</a>
+      <a class="ch-part" href="#episodes"><b>01</b>Season 1 Episodes</a>
+      <div class="ch-eps">
+        <a href="#ep1">Noah</a><a href="#ep2">Abraham</a><a href="#ep3">Joseph</a><a href="#ep4">Moses</a>
+        <a href="#ep5">Joshua</a><a href="#ep6">Samson</a><a href="#ep7">David</a><a href="#ep8">Solomon</a>
+      </div>
+      <a class="ch-sub" href="#characters">Character Design</a>
+      <a class="ch-part" href="#team"><b>02</b>The Team</a>
+      <a class="ch-sub" href="#creators">The Creators</a>
+      <a class="ch-sub" href="#hits">Selected Hits</a>
+      <a class="ch-sub" href="#ai-team">The AI Production Team</a>
+      <a class="ch-sub" href="#track-record">AI Track Record</a>
+      <a class="ch-sub" href="#studio-work">iAI Studio Work</a>
+      <a class="ch-part" href="#partnership"><b>03</b>The Partnership</a>
+      <a class="ch-sub" href="#proof">Proof of Concept</a>
+      <a class="ch-sub" href="#why-partner">Why Partner</a>
+      <a class="ch-top" href="#contact">Contact</a>
+    </nav>
+  </div>
+</div>
+
 <dialog class="lightbox" aria-label="Image preview"><button class="lb-close" type="button" aria-label="Close image preview">×</button><img alt=""></dialog>
 
 <script src="lenis.min.js?v=3"></script>
-<script src="main.js?v=12"></script>
+<script src="main.js?v=14"></script>
 </body>
 </html>

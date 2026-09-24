@@ -262,6 +262,80 @@
     start().then(ok => { if (!ok && !isOff()) arm(); });
   }
 
+  // ---- chapters menu (phones and tablets) ----
+  const chapters = document.querySelector('.chapters');
+  const menuBtns = [...document.querySelectorAll('.menu-btn')];
+  const chLinks = [...chapters.querySelectorAll('a[href^="#"]')];
+  const chTargets = chLinks.map(a => document.querySelector(a.getAttribute('href')));
+  let menuState = false, pendingJump = null;
+  function markHere() {
+    const line = innerHeight * 0.35;
+    let cur = -1;
+    chTargets.forEach((t, i) => { if (t && t.getBoundingClientRect().top <= line) cur = i; });
+    chLinks.forEach((a, i) => a.classList.toggle('here', i === cur));
+  }
+  function openMenu() {
+    if (menuState) return;
+    markHere();
+    chapters.hidden = false;
+    requestAnimationFrame(() => requestAnimationFrame(() => chapters.classList.add('open')));
+    document.documentElement.classList.add('menu-open');
+    menuBtns.forEach(b => b.setAttribute('aria-expanded', 'true'));
+    menuState = true;
+    history.pushState({ genesisMenu: 1 }, '');
+    const here = chapters.querySelector('a.here');
+    here && here.scrollIntoView({ block: 'center' });
+  }
+  function hideMenu() {
+    if (!menuState) return;
+    menuState = false;
+    chapters.classList.remove('open');
+    document.documentElement.classList.remove('menu-open');
+    menuBtns.forEach(b => b.setAttribute('aria-expanded', 'false'));
+    setTimeout(() => { if (!menuState) chapters.hidden = true; }, 450);
+    if (pendingJump) {
+      const t = pendingJump; pendingJump = null;
+      requestAnimationFrame(() => t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }));
+    }
+  }
+  const closeMenu = () => { if (history.state && history.state.genesisMenu) history.back(); else hideMenu(); };
+  addEventListener('popstate', hideMenu);   // the phone's back gesture closes the menu
+  menuBtns.forEach(b => b.addEventListener('click', openMenu));
+  chapters.querySelector('.chapters-close').addEventListener('click', closeMenu);
+  chapters.addEventListener('click', e => { if (e.target === chapters) closeMenu(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && menuState) closeMenu(); });
+  chLinks.forEach((a, i) => a.addEventListener('click', e => { e.preventDefault(); pendingJump = chTargets[i]; closeMenu(); }));
+
+  // ---- gentle settle on phones and tablets ----
+  // When the finger is off the glass and the momentum has stopped, a section top that is close
+  // glides into place under the bar. Anywhere else nothing moves.
+  const touchMedia = matchMedia('(max-width: 1000px) and (prefers-reduced-motion: no-preference)');
+  const SNAP_REACH = 0.22, IDLE = 170;
+  let touching = false, settling = false, idleTimer = 0, settleGuard = 0;
+  addEventListener('touchstart', () => { touching = true; settling = false; clearTimeout(idleTimer); }, { passive: true });
+  addEventListener('touchend', () => { touching = false; clearTimeout(idleTimer); idleTimer = setTimeout(settleNow, IDLE); }, { passive: true });
+  addEventListener('scroll', () => {
+    if (!touchMedia.matches || settling) return;
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(settleNow, IDLE);
+  }, { passive: true });
+  function settleNow() {
+    if (!touchMedia.matches || touching || settling || menuState || document.documentElement.classList.contains('gated')) return;
+    const y = scrollY, bar = nav.offsetHeight, h = innerHeight;
+    const max = document.documentElement.scrollHeight - h;
+    let best = null;
+    document.querySelectorAll('body > header, body > section, body > footer').forEach(s => {
+      const top = s.getBoundingClientRect().top + y;
+      const t = Math.min(max, Math.max(0, top === 0 ? 0 : top - bar));
+      if (best === null || Math.abs(t - y) < Math.abs(best - y)) best = t;
+    });
+    if (best === null || Math.abs(best - y) < 3 || Math.abs(best - y) > h * SNAP_REACH) return;
+    settling = true;
+    scrollTo({ top: best, behavior: 'smooth' });
+    clearTimeout(settleGuard);
+    settleGuard = setTimeout(() => { settling = false; }, 900);
+  }
+
   // ---- lightbox ----
   const lb = document.querySelector('.lightbox');
   const lbImg = lb.querySelector('img');
