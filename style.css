@@ -362,11 +362,11 @@ html.gated .gate { display: flex; }
 .hero.cinematic::before, .hero.cinematic::after {
   content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
 }
-.hero.cinematic::before { background: #0e0a07; animation: opening-darkness 2.8s cubic-bezier(.22,.7,.2,1) both; }
+.hero.cinematic::before { background: #0e0a07; animation: opening-darkness 2.4s ease-out both; }
 .hero.cinematic::after {
   inset: -25%;
   background: linear-gradient(112deg, transparent 30%, rgba(255,231,178,.04) 40%, rgba(255,242,208,.24) 48%, rgba(255,222,151,.07) 55%, transparent 65%);
-  filter: blur(22px); mix-blend-mode: screen;
+  filter: blur(42px); mix-blend-mode: screen;
   animation: opening-sunlight 3.5s cubic-bezier(.2,.65,.25,1) both;
 }
 .hero.cinematic .hero-img { animation: opening-scene 3.2s cubic-bezier(.16,1,.3,1) both; }
@@ -388,21 +388,22 @@ html.gated .gate { display: flex; }
 .hero.cinematic .credits { animation: opening-copy 1s ease 2.45s both; }
 .hero.cinematic .scroll-cue, .hero.cinematic .sound.on-hero { animation: heroIn 1s ease 3s both; }
 @keyframes opening-darkness { 0%, 8% { opacity: 1; } 65% { opacity: .12; } 100% { opacity: 0; } }
-@keyframes opening-scene { from { transform: scale(1.065); filter: brightness(.45) blur(5px); } to { transform: scale(1); filter: brightness(1) blur(0); } }
+@keyframes opening-scene { from { transform: scale(1.015); filter: brightness(.75); } to { transform: scale(1); filter: brightness(1); } }
 @keyframes opening-sunlight {
-  0% { opacity: 0; transform: translateX(35%); }
-  25% { opacity: .85; }
-  65% { opacity: .6; }
-  100% { opacity: 0; transform: translateX(-35%); }
+  0% { opacity: 0; transform: translateX(12%); }
+  25% { opacity: .25; }
+  65% { opacity: .18; }
+  100% { opacity: 0; transform: translateX(-12%); }
 }
 @keyframes opening-letter {
-  from { opacity: 0; transform: translateY(.22em) scale(.94); filter: blur(10px); }
+  from { opacity: 0; transform: translateY(.035em); filter: blur(1.5px); }
   65% { opacity: 1; filter: blur(0); }
   to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
 @keyframes opening-gold { from { background-position: 100% 50%; } to { background-position: 0% 50%; } }
-@keyframes opening-rule { from { opacity: 0; transform: scaleX(.12); } to { opacity: 1; transform: scaleX(1); } }
-@keyframes opening-copy { from { opacity: 0; transform: translateY(12px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+@keyframes opening-rule { from { opacity: 0; transform: scaleX(.9); } to { opacity: 1; transform: scaleX(1); } }
+@keyframes opening-copy { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
 .gate .rays { left: 50%; top: 8%; opacity: .5; }
 .gate-box { position: relative; z-index: 2; width: min(560px, 100%); display: flex; flex-direction: column; align-items: center; animation: heroIn 1.2s var(--ease) both; }
 .gate-logo { width: min(150px, 30vw); margin-bottom: 4svh; }

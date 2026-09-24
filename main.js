@@ -217,7 +217,7 @@
         const span = document.createElement('span');
         span.className = 'intro-letter';
         span.textContent = letter;
-        span.style.setProperty('--letter-delay', `${.85 + i * .085}s`);
+        span.style.setProperty('--letter-delay', `${.65 + i * .025}s`);
         span.setAttribute('aria-hidden', 'true');
         title.append(span);
       });
