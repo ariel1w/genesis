@@ -118,7 +118,7 @@
   // ---- smooth glide + soft landing (same feel as The Box) ----
   const REACH = 0.28, LAND = 0.95;
   const soft = t => 1 - Math.pow(1 - t, 4);
-  const media = matchMedia('(min-width: 801px) and (prefers-reduced-motion: no-preference)');
+  const media = matchMedia('(min-width: 1001px) and (min-height: 540px) and (prefers-reduced-motion: no-preference)');
   let stopGlide = () => {};
   function glide() {
     stopGlide();
